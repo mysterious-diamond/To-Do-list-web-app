@@ -7,7 +7,8 @@ conn = mysql.connector.connect(
     host = "172.29.208.1",
     user = "root",
     password = "pass",
-    database = "db1"
+    database = "db1",
+    autocommit = True
 )
 
 @app.route("/")
@@ -22,12 +23,12 @@ def login() :
     if request.method == "GET" :
         return render_template("login.html")
     
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
     
     username = request.form.get("username")
     passwd = request.form.get("password")
     
-    cur.execute("SELECT id, username, passwd FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT id, passwd FROM users WHERE username = %s", (username,))
     res = cur.fetchone()
     
     if res and passwd == res["passwd"]:
@@ -36,6 +37,31 @@ def login() :
         return redirect("/")
         
     return render_template("login.html")
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup() :
+    if request.method == "GET" :
+        return render_template("signup.html")
+    
+    cur = conn.cursor()
+    
+    username = request.form.get("username")
+    passwd = request.form.get("password")
+    email = request.form.get("email")
+    
+    cur.execute("SELECT passwd FROM users WHERE username = %s", (username,))
+    res = cur.fetchone()
+    
+    if res:
+        return redirect("/login")
+    
+    cur.execute("INSERT INTO users(username, passwd, email) VALUES(%s, %s, %s)", (username, passwd, email))
+    return redirect("/login")
+
+@app.route("/logout")
+def logout() :
+    session.clear()
+    return redirect("/login")
 
 if __name__ == "__main__":
     app.run(debug=True)
