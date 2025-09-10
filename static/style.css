@@ -1,0 +1,17 @@
+body {
+    background-color: lightgreen;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.form-container{
+    background-color: grey;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 50px;
+    height: fit-content;
+    width: fit-content;
+    border-radius: 50px;
+}
+

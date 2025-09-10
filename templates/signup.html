@@ -1,15 +1,17 @@
 <html>
 <head>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <form method="POST">
-        Username : <input type="text" name="username"><br>
-        Password : <input type="password" name="password"><br>
-        Email(Optional) : <input type="text" name="email"><br>
-        <button type="submit">Signup</button><br>
-    </form>
-    <a href="/login">Already have an account?</a>
+    <div class="form-container">
+        <form method="POST">
+            Username : <input type="text" name="username"><br>
+            Password : <input type="password" name="password"><br>
+            Email(Optional) : <input type="text" name="email"><br>
+            <button type="submit">Signup</button><br>
+            <a href="/login">Already have an account?</a>
+        </form>
+    </div>
 </body>
 </html>
