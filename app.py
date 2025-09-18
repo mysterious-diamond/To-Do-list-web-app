@@ -7,7 +7,8 @@ app.secret_key = "123"
 bcrypt = Bcrypt(app)
 
 conn = mysql.connector.connect(
-    host = "172.29.208.1",
+    host = "172.31.128.1",
+    port=3306,
     user = "root",
     password = "pass",
     database = "db1",
@@ -24,10 +25,10 @@ def home() :
         return redirect("/login")
     
     cur = conn.cursor(dictionary=True)
-    cur.execute("SELECT * FROM tasks WHERE user_id = %s", (session["id"],))
+    cur.execute("SELECT * FROM tasks WHERE user_id = %s ORDER BY creation_date ASC", (session["id"],))
     res = cur.fetchall()
     
-    return render_template("home.html", name=session["username"], res=res)
+    return render_template("home.html", name=session["username"], tasks=res)
 
 @app.route("/login", methods=["GET", "POST"])
 def login() :
@@ -39,11 +40,11 @@ def login() :
     username = request.form.get("username")
     passwd = request.form.get("password")
     
-    cur.execute("SELECT id, passwd FROM users WHERE username = %s OR email = %s", (username, username))
+    cur.execute("SELECT id, passwd, username FROM users WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s)", (username, username))
     res = cur.fetchone()
     
     if res and bcrypt.check_password_hash(res["passwd"], passwd):
-            register_session(username, res["id"])
+            register_session(res["username"], res["id"])
             return redirect("/")
         
     return render_template("login.html")
@@ -59,7 +60,7 @@ def signup() :
     passwd = request.form.get("password")
     email = request.form.get("email")
     
-    cur.execute("SELECT passwd FROM users WHERE username = %s OR email = %s", (username, email))
+    cur.execute("SELECT passwd FROM users WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s)", (username, email))
     res = cur.fetchone()
     
     if res:
@@ -89,6 +90,39 @@ def delete_acc() :
     cur.execute("DELETE FROM users WHERE id = %s", (session["id"],))
     return redirect("/login")
 
+@app.route("/task-add", methods=["GET", "POST"])
+def task_add() :
+    if "username" not in session :
+        return redirect("/login")
+    
+    if request.method == "GET" :
+        return render_template("task_add.html")
+    
+    title = request.form.get("title")
+    due_date = request.form.get("due_date")
+    
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM tasks WHERE title = %s AND user_id = %s", (title, session["id"]))
+    res = cur.fetchone()
+    
+    if res :
+        return render_template("task_add.html")
+    
+    if not due_date :
+        cur.execute("INSERT INTO tasks(user_id, title) VALUES(%s, %s)", (session["id"], title))
+    else :
+        cur.execute("INSERT INTO tasks(user_id, title, due_date) VALUES(%s, %s, %s)", (session["id"], title, due_date))
+        
+    return redirect("/")
+
+@app.route("/complete-task/<int:task_id>", methods=["POST"])
+def complete_task(task_id) :
+    if "id" not in session :
+        return redirect("/login")
+    
+    cur = conn.cursor(dictionary=True)
+    cur.execute("DELETE FROM tasks WHERE id=%s AND user_id=%s", (task_id, session["id"]))
+    return redirect("/")
+
 if __name__ == "__main__":
     app.run(debug=True)
-

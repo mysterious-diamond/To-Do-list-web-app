@@ -1,13 +1,62 @@
+<!DOCTYPE html>
+
 <html>
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="form-container">
-        <h1>Hello, {{name}}!</h1><br><br>
+        <h1>Hello, {{name}}!</h1><br>
+        <ul>
+            {% for task in tasks %}
+                <li class="task-item">
+                    {% if task.due_date %}
+                        <pre>{{ task.title }}    {{ task.due_date }}</pre>
+                    {% else %}
+                        <span>{{ task.title }}</span>
+                    {% endif %}
+
+                    <form action="/complete-task/{{task.id}}" method="POST" style="display:inline;">
+                        <button type="submit">Complete</button>
+                    </form>
+                </li>
+            {% else %}
+                <li>No tasks yet.</li>
+            {% endfor %}
+        </ul><br>
+
+        <form action="/task-add" method="POST">
+            Title : <input type="text" name="title"><br>
+
+            <div id="dueDateContainer">
+                Due Date: 
+                <input type="datetime-local" id="due_date" name="due_date" disabled>
+            </div>
+
+            <button type="button" id="toggleDueDate">Add a duedate</button><br>
+
+            <button type="submit">Add task</button><br>
+        </form><br>
         
+        <a href="/">Back to home</a><br>
         <a href="/logout">Logout</a><br>
         <a href="/delete-acc">Delete this account</a>
     </div>
+
+    <script>
+        const toggleBtn = document.getElementById("toggleDueDate");
+        const dueDateInput = document.getElementById("due_date");
+
+        toggleBtn.addEventListener("click", () => {
+            if (dueDateInput.disabled) {
+                dueDateInput.disabled = false;
+                toggleBtn.textContent = "Disable Due Date";
+            } else {
+                dueDateInput.disabled = true;
+                dueDateInput.value = ""; // clear value if disabled
+                toggleBtn.textContent = "Enable Due Date";
+            }
+        });
+    </script>
 </body>
 </html>

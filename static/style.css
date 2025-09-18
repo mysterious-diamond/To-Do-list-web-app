@@ -6,6 +6,11 @@ body {
     height: 100vh;
 }
 
+ul {
+    list-style-type: disc; /* show regular bullets */
+    padding-left: 20px;    /* space so bullets don’t overlap with text */
+}
+
 .form-container{
     background-color: grey;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,3 +20,47 @@ body {
     border-radius: 50px;
 }
 
+.task-item {
+    display: flex;
+    justify-content: space-between; /* pushes text left, button right */
+    align-items: center;            /* keeps them vertically aligned */
+    margin-bottom: 10px;            /* space between tasks */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;  /* rounded rectangle */
+    font-size: 16px;
+    margin-bottom: 10px;
+    width: 250px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus {
+    border-color: #4CAF50; /* green highlight on focus */
+}
+
+/* Style for submit buttons */
+button,
+input[type="submit"] {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;  /* pill-shaped button */
+    background-color: #4CAF50; /* nice green */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background-color: #45a049;
+    transform: scale(1.05); /* slight zoom on hover */
+}
